@@ -9,15 +9,40 @@ require_once("./view/view.php");
 require_once("./model/model.php");
 
 class ControllerClass {
+    private $userName;
+    private $password;
+    private $errorMSG;
 
     public function __construct() {
         $this->view = new ViewClass();
         $this->model = new ModelClass();
+
+    }
+    //funktion som skickar vidare felmed.
+    function errorMSGControll() {
+        $this->errorMSG = $this->model->getErrorMSG();
+        $this->view->errorMSGHandler($this->errorMSG);
     }
 
+    //hanterar alla
     public function formControll() {
+
+
+
+            if ($this->view->retrieveFormPostInfoIfLoginButtonClicked()) {
+                $this->userName = $this->view->getUserName();
+                $this->password = $this->view->getPassword();
+
+                if($this->model->userInputOK($this->userName,$this->password)) {
+                    $this->model->startSession();
+                    $this->view->loginMessage();
+
+                    return $this->view->loggedInForm();
+                }else {
+                    $this->errorMSGControll();
+                }
+
+        }
         return $this->view->loginForm();
-
     }
-
 }
