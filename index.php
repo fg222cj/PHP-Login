@@ -1,21 +1,16 @@
- <?php
- /**
-  * Created by PhpStorm.
-  * User: erikmagnusson
-  * Date: 17/09/14
-  * Time: 19:25
-  */
+<?php
+
 session_start();
-error_reporting(E_ALL); ini_set('display_errors', 'on');
-ini_set( 'default_charset', 'UTF-8' );
+error_reporting(E_ALL); ini_set('display_errors','on');
+ini_set('default_charset', 'UTF-8');
+date_default_timezone_set('Europe/Stockholm');
 
 require_once("controller/controller.php");
 require_once("view/HTMLView.php");
 
-
 $view = new HTMLView();
-$LC = new ControllerClass();
+$Controller = new ControllerClass();
 
-$LVC = $LC->formControll();
+$ControllerFormControll = $Controller->formControll();
 
-$view->echoHTML($LVC);
+$view->echoHTML($ControllerFormControll);

@@ -13,6 +13,7 @@ class ControllerClass {
     private $password;
     private $errorMSG;
 
+
     public function __construct() {
         $this->view = new ViewClass();
         $this->model = new ModelClass();
@@ -28,20 +29,39 @@ class ControllerClass {
     public function formControll() {
 
 
+        if($this->view->ifUserClickedLogoutButton()){
+            return $this->view->loginForm();
+        }
+        if($this->model->doesSessionExist()){
+            return $this->view->loggedInForm();
 
-            if ($this->view->retrieveFormPostInfoIfLoginButtonClicked()) {
-                $this->userName = $this->view->getUserName();
-                $this->password = $this->view->getPassword();
+        } elseif($this->view->doesCookieExist()){
+            $this->view->lognWithCookie();
+            $this->model->startSession();
+            return $this->view->loggedInForm();
 
-                if($this->model->userInputOK($this->userName,$this->password)) {
-                    $this->model->startSession();
-                    $this->view->loginMessage();
+        } else {
 
-                    return $this->view->loggedInForm();
-                }else {
-                    $this->errorMSGControll();
+            $this->view->setCookie($this->model->getCookiePass());
+        }
+
+
+        if ($this->view->retrieveFormPostInfoIfLoginButtonClicked()) {
+            $this->userName = $this->view->getUserName();
+            $this->password = $this->view->getPassword();
+
+            if($this->model->userInputOK($this->userName,$this->password)) {
+                $this->model->startSession();
+                $this->view->loginWithoutCookieMessage();
+
+                if(!$this->view->doesCookieExist()){
+                    $this->view->setCookie($this->model->getCookiePass());
                 }
 
+                return $this->view->loggedInForm();
+            }else {
+                $this->errorMSGControll();
+            }
         }
         return $this->view->loginForm();
     }
