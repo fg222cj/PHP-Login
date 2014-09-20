@@ -13,7 +13,6 @@ class HTMLView {
 				<html>
                     <body>
                         $body
-
                     </body>
 				</html>
             ";

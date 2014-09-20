@@ -12,22 +12,28 @@ class ViewClass {
     private $password;
     private $errorMSG;
     private $message;
-
+    private $cookieExpiration;
+    private $userCookieValue;
+   //initiates Time()
     function __construct() {
         $this->Time();
     }
+    //function to check if page is refreshed(not used)
     public function PageIsRefreshed(){
         if(isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0'){
         return true;
         }
     }
+    //TIme() set the local time and creates a string for the Forms to print the current time
     public function Time() {
         setlocale(LC_ALL, "sv_SE");
         $this->time = (strftime("%A, den %d %B år %Y. Klockan är [%X]"));
     }
+    //Recieves the error message sent from controller<-Model
     public function errorMSGHandler($errorMSG) {
         $this->errorMSG = $errorMSG;
     }
+    //the form presented when user wants to login
     function loginForm() {
         $errorMSG = $this->errorMSG;
         $message = $this->message;
@@ -53,7 +59,7 @@ class ViewClass {
         ";
         return $ret;
     }
-
+    //the form presented when user is logged in
     function loggedInForm() {
         $message = $this->message;
 
@@ -71,15 +77,15 @@ class ViewClass {
         ";
         return $ret;
     }
-
+    //check if any posts are made and stores values into variables
     public function retrieveFormPostInfoIfLoginButtonClicked() {
-        //variablerna måste kommas ihåg om sidan uppdateras
         if(isset($_POST["loginbutton"])){
             $this->userName = $_POST["userName"];
             $this->password = $_POST["password"];
             return true;
         }
     }
+    //if the user clicked logoutbutton it unsets all sessions and cookies and logs user out
     function ifUserClickedLogoutButton() {
         if (isset($_POST["logoutbutton"])) {
             setcookie ("Cookie", "", time() - 300);
@@ -89,13 +95,6 @@ class ViewClass {
             return $this->loginForm();
         }
     }
-   /* public function retrieveFormPostInfoIfLogoutButtonClicked() {
-        //variablerna måste kommas ihåg om sidan uppdateras
-        if(isset($_POST["logoutbutton"])){
-            var_dump('d');
-            return true;
-        }
-    }*/
 
 
     function doesCookieExist() {
@@ -109,10 +108,21 @@ class ViewClass {
             if(isset($_POST['checked']) && $_POST['checked'] == 'on') {
                 $this->loginWithCookieMessage();
                 // Set a cookie that expires in 24 hours
-                $cookieExpirationTime = time()+300;
-                setcookie("Cookie",$pass, $cookieExpirationTime, "/");
+
+                $this->cookieExpiration = time()+60;
+                setcookie("Cookie",$pass, $this->cookieExpiration, "/");
             }
         }
+    }
+    function unsetCookie() {
+        setcookie ("Cookie", "", time() - 3600);
+    }
+    function unsetSession() {
+        unset($_SESSION['LOGIN']);
+        unset($_SESSION['USER']);
+    }
+    function getCookieValues() {
+        $this->userCookieValue = $_COOKIE["Cookie"];
     }
 
     public function loginWithoutCookieMessage() {
@@ -124,8 +134,11 @@ class ViewClass {
     public function logoutMessage() {
         $this->message = "You logged out successfully";
     }
-    public function lognWithCookie() {
+    public function loginWithCookie() {
         $this->message = "You logged in with cookie";
+    }
+    public function logoutFaultyCookie() {
+        $this->message = "Cookie doesn't check out";
     }
 
     function getUserName() {
@@ -133,5 +146,11 @@ class ViewClass {
     }
     function getPassword() {
         return $this->password;
+    }
+    function getCookieExpiration() {
+        return $this->cookieExpiration;
+    }
+    function getUserCookieValue() {
+        return $this->userCookieValue;
     }
 }

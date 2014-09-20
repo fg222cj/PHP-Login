@@ -10,6 +10,7 @@ class ModelClass {
     private $pass = "pass";
     private $errorMSG;
     private $cookiePass = "pazz";
+    private $cookieExpirationTime;
 
     public function __construct() {
     }
@@ -34,8 +35,28 @@ class ModelClass {
                 $_SESSION['USERINFO'] = true;
                 $userBrowser = $_SERVER['HTTP_USER_AGENT'];
                 $_SESSION["USERINFO"] = $userBrowser;
+
             }
             return true;
+        }
+    }
+    function ifSessionIsNotStolen() {
+        if(isset($_SESSION["USERINFO"]) && $_SERVER['HTTP_USER_AGENT'] == $_SESSION["USERINFO"]){
+            return true;
+        }
+    }
+
+    function storeCookieExpirationTime($userCookieExpirationTime) {
+        $this->cookieExpirationTime = $userCookieExpirationTime;
+        file_put_contents("textfile.txt", $this->cookieExpirationTime );
+    }
+    function ifCookieIsNotManipulated($userCookieValue) {
+        $this->myfile = file_get_contents("textfile.txt");
+
+        if($userCookieValue == $this->cookiePass) {
+            if($this->myfile > time()){
+                return true;
+            }
         }
     }
 

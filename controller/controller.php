@@ -32,20 +32,32 @@ class ControllerClass {
         if($this->view->ifUserClickedLogoutButton()){
             return $this->view->loginForm();
         }
+
         if($this->model->doesSessionExist()){
+            if($this->model->ifSessionIsNotStolen()){
             return $this->view->loggedInForm();
 
+            }
         } elseif($this->view->doesCookieExist()){
-            $this->view->lognWithCookie();
-            $this->model->startSession();
-            return $this->view->loggedInForm();
+            $this->view->getCookieValues();
+            if($this->model->ifCookieIsNotManipulated($this->view->getUserCookieValue())){
+
+                $this->view->loginWithCookie();
+                $this->model->startSession();
+                return $this->view->loggedInForm();
+
+            } else {
+                $this->view->logoutFaultyCookie();
+                $this->view->unsetCookie();
+                $this->view->unsetSession();
+                return $this->view->loginForm();
+            }
 
         } else {
-
             $this->view->setCookie($this->model->getCookiePass());
+            $this->model->storeCookieExpirationTime($this->view->getCookieExpiration());
+
         }
-
-
         if ($this->view->retrieveFormPostInfoIfLoginButtonClicked()) {
             $this->userName = $this->view->getUserName();
             $this->password = $this->view->getPassword();
@@ -56,6 +68,7 @@ class ControllerClass {
 
                 if(!$this->view->doesCookieExist()){
                     $this->view->setCookie($this->model->getCookiePass());
+                    $this->model->storeCookieExpirationTime($this->view->getCookieExpiration());
                 }
 
                 return $this->view->loggedInForm();
@@ -63,6 +76,7 @@ class ControllerClass {
                 $this->errorMSGControll();
             }
         }
+
         return $this->view->loginForm();
     }
 }
