@@ -41,7 +41,7 @@ class ViewClass {
 
         $ret = "
         <h1>Login Application</h1>
-        <form method=post enctype=multipart/form-data>
+        <form method=post enctype=multipart/form-data action=?loggedIn>
             <fieldset>
             <p>$message</p>
             <p>$errorMSG</p>
@@ -66,7 +66,7 @@ class ViewClass {
         $timeVariable = $this->time;
         $ret = "
        <h1>Logged in to Application</h1>
-        <form method=post enctype=multipart/form-data>
+        <form method=post enctype=multipart/form-data action=?loggedOut>
             <fieldset>
                 <legend>You are now signed in as Admin</legend>
                 <p>$message</p>
