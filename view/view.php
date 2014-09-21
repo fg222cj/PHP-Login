@@ -97,39 +97,50 @@ class ViewClass {
     }
 
 
+
+    // function check if certrain cookie exists
     function doesCookieExist() {
         if (isset($_COOKIE["Cookie"])){
             return true;
         }
     }
+    //creates a cookie
     function setCookie($pass) {
+        //check if loginbutton has been clicked
         if(isset($_POST['loginbutton'])){
-                // Checks if checkbox is checked
+            // Checks if checkbox is checked
             if(isset($_POST['checked']) && $_POST['checked'] == 'on') {
+                //renders a login message for the user
                 $this->loginWithCookieMessage();
-                // Set a cookie that expires in 24 hours
-
+                //stores the amount of time cookie should be valid
                 $this->cookieExpiration = time()+60;
+                // Set a cookie that expires in a centrain amount of time
                 setcookie("Cookie",$pass, $this->cookieExpiration, "/");
             }
         }
     }
+    //destroys cookie
     function unsetCookie() {
         setcookie ("Cookie", "", time() - 3600);
     }
+    //deeeeestroys session
     function unsetSession() {
         unset($_SESSION['LOGIN']);
         unset($_SESSION['USER']);
     }
+
+    //stores the value of the cookie, in this case the string that works as a password
     function getCookieValues() {
         $this->userCookieValue = $_COOKIE["Cookie"];
     }
 
+
+    // these functions delivers either login fail or success message depending on UC
     public function loginWithoutCookieMessage() {
-        $this->message = "success";
+        $this->message = "successfully logged in";
     }
     public function loginWithCookieMessage() {
-        $this->message = "Login With Cookie, You will be remembered";
+        $this->message = "Login With Cookie, you will be remembered";
     }
     public function logoutMessage() {
         $this->message = "You logged out successfully";
@@ -138,9 +149,11 @@ class ViewClass {
         $this->message = "You logged in with cookie";
     }
     public function logoutFaultyCookie() {
-        $this->message = "Cookie doesn't check out";
+        $this->message = "Cookie info seem sketchy out";
     }
 
+
+    //Getters
     function getUserName() {
         return $this->userName;
     }

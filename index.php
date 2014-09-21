@@ -9,7 +9,6 @@ require_once("view/HTMLview.php");
 require_once("controller/controller.php");
 
 
-
 $view = new HTMLView();
 $Controller = new ControllerClass();
 
