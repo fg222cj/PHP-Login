@@ -14,6 +14,7 @@ class ViewClass {
     private $message;
     private $cookieExpiration;
     private $userCookieValue;
+	private $passCookieValue;
    //initiates Time()
     function __construct() {
         $this->Time();
@@ -88,7 +89,7 @@ class ViewClass {
     //if the user clicked logoutbutton it unsets all sessions and cookies and logs user out
     function ifUserClickedLogoutButton() {
         if (isset($_POST["logoutbutton"])) {
-            setcookie ("Cookie", "", time() - 300);
+            $this->unsetCookie();
             unset($_SESSION['LOGIN']);
             unset($_SESSION['USER']);
             $this->logoutMessage();
@@ -100,28 +101,38 @@ class ViewClass {
 
     // function check if certrain cookie exists
     function doesCookieExist() {
-        if (isset($_COOKIE["Cookie"])){
+        if (isset($_COOKIE["Password"]) && isset($_COOKIE["Username"])){
             return true;
         }
     }
     //creates a cookie
-    function setCookie($pass) {
+    function setCookie($user, $pass) {
         //check if loginbutton has been clicked
-        if(isset($_POST['loginbutton'])){
+    	if($this->didUserPressLogin()) {
             // Checks if checkbox is checked
-            if(isset($_POST['checked']) && $_POST['checked'] == 'on') {
+            if($this->didUserWantToStayLoggedIn()) {
                 //renders a login message for the user
                 $this->loginWithCookieMessage();
                 //stores the amount of time cookie should be valid
-                $this->cookieExpiration = time()+60;
+                $this->cookieExpiration = time()+60*60*24*30;
                 // Set a cookie that expires in a centrain amount of time
-                setcookie("Cookie",$pass, $this->cookieExpiration, "/");
+                setcookie("Username",$user, $this->cookieExpiration, "/");
+                setcookie("Password",$pass, $this->cookieExpiration, "/");
             }
-        }
+		}
     }
+	//returns true if user pressed login button
+	function didUserPressLogin() {
+		return isset($_POST['loginbutton']);
+	}
+	//returns true if user checked "stay logged in"-box
+	function didUserWantToStayLoggedIn() {
+		return (isset($_POST['checked']) && $_POST['checked'] == 'on');
+	}
     //destroys cookie
     function unsetCookie() {
-        setcookie ("Cookie", "", time() - 3600);
+    	setcookie ("Username", "", time() - 3600);
+        setcookie ("Password", "", time() - 3600);
     }
     //deeeeestroys session
     function unsetSession() {
@@ -131,7 +142,8 @@ class ViewClass {
 
     //stores the value of the cookie, in this case the string that works as a password
     function getCookieValues() {
-        $this->userCookieValue = $_COOKIE["Cookie"];
+        $this->userCookieValue = $_COOKIE["Username"];
+		$this->passCookieValue = $_COOKIE["Password"];
     }
 
 
@@ -165,5 +177,8 @@ class ViewClass {
     }
     function getUserCookieValue() {
         return $this->userCookieValue;
+    }
+	function getPasswordCookieValue() {
+        return $this->passCookieValue;
     }
 }

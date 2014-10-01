@@ -5,12 +5,17 @@
  * Date: 17/09/14
  * Time: 19:25
  */
+ require_once("./helpers/FileHandling.php");
+ 
 class ModelClass {
     private $user = "user";
     private $pass = "pass";
     private $errorMSG;
-    private $cookiePassword = "pazz";
+    private $temporaryPassword;
     private $cookieExpirationTime;
+	
+	private $usersFilePath = "Users.txt";						// I denna fil finns alla användare och deras (krypterade) lösenord sparade.
+	private $savedCredentialsFilePath = "TempPasswords.txt";	// I denna fil lagras användare och temporära lösenord när användaren vill fortsätta vara inloggad.
 
     public function __construct() {
     }
@@ -49,24 +54,30 @@ class ModelClass {
             return true;
         }
     }
+	//creates temporary unique password based on the users real password and the current time
+	function createTemporaryPassword($password) {
+		$this->temporaryPassword = md5($password . time());
+	}
 
-    //stores expirationtime into textfile
-    function storeCookieExpirationTime($userCookieExpirationTime) {
-        $this->cookieExpirationTime = $userCookieExpirationTime;
-        file_put_contents("textfile.txt", $this->cookieExpirationTime );
-    }
+    //stores username, temporary password and expirationtime into textfile
+    public function saveCredentialsOnServer($username, $password, $expirationTime) {
+			$savedCredentials = $username . ";" . $password . ";" . $expirationTime;
+			$this->helpers->WriteLineToFile($this->savedCredentialsFilePath, $savedCredentials);
+		}
     //checks if cookie is manipulated
-    function ifCookieIsNotManipulated($userCookieValue) {
+    function ifCookieIsNotManipulated($userCookieValue, $passwordCookieValue) {
         //reads from file where expirationtime is stored
-        $this->myfile = file_get_contents("textfile.txt");
-        //checks if the cookies value(password) checks out(should be "pazz")
-        if($userCookieValue == $this->cookiePassword) {
-            //if it does, the it checks if the time stored in cookie is more than the current time
-            //if the stored time is set on a moment that is futher on than the current time, it has been manipulated
-            if($this->myfile > time()){
-                return true;
-            }
-        }
+        $this->myfile = file_get_contents($savedCredentialsFilePath);
+		foreach($this->myfile as $row) {
+			//checks if the cookies values checks out
+        	if($userCookieValue == $row[0] && $passwordCookieValue == $row[1]) {
+	            //if it does, the it checks if the time stored in cookie is more than the current time
+	            //if the stored time is set on a moment that is futher on than the current time, it has been manipulated
+	            if($row[2] > time()){
+	                return true;
+	            }
+	        }
+		}
     }
     // check if a certain session exists
     function doesSessionExist() {
