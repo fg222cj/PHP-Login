@@ -1,5 +1,5 @@
 <?php
-    class Helpers {
+    class FileHandling {
     	// Lägger till en sträng i en fil. En radbrytning läggs in i slutet av strängen.
 		public static function WriteLineToFile($file, $line) {
 			$handle = fopen($file, "a");

@@ -90,10 +90,9 @@ class ViewClass {
     function ifUserClickedLogoutButton() {
         if (isset($_POST["logoutbutton"])) {
             $this->unsetCookie();
-            unset($_SESSION['LOGIN']);
-            unset($_SESSION['USER']);
+            $this->unsetSession();
             $this->logoutMessage();
-            return $this->loginForm();
+            return true;
         }
     }
 
@@ -116,8 +115,8 @@ class ViewClass {
                 //stores the amount of time cookie should be valid
                 $this->cookieExpiration = time()+60*60*24*30;
                 // Set a cookie that expires in a centrain amount of time
-                setcookie("Username",$user, $this->cookieExpiration, "/");
-                setcookie("Password",$pass, $this->cookieExpiration, "/");
+                setcookie("Username",$user, $this->cookieExpiration);
+                setcookie("Password",$pass, $this->cookieExpiration);
             }
 		}
     }
@@ -129,10 +128,10 @@ class ViewClass {
 	function didUserWantToStayLoggedIn() {
 		return (isset($_POST['checked']) && $_POST['checked'] == 'on');
 	}
-    //destroys cookie
+    //destroys cookies
     function unsetCookie() {
-    	setcookie ("Username", "", time() - 3600);
-        setcookie ("Password", "", time() - 3600);
+    	setcookie("Username", "", time() - 3600);
+        setcookie("Password", "", time() - 3600);
     }
     //deeeeestroys session
     function unsetSession() {
@@ -164,6 +163,12 @@ class ViewClass {
         $this->message = "Cookie info seem sketchy out";
     }
 
+	// Tar bort alla lagrade cookies.
+	public function destroyAllCookies() {
+		foreach ($_COOKIE as $c_key => $c_value) {
+			setcookie($c_key, NULL, 1);
+		}
+	}
 
     //Getters
     function getUserName() {

@@ -65,11 +65,13 @@ class ControllerClass {
                 return $this->view->loginForm();
             }
         //if there isn't an session or a cookie, it creates a cookie and stores the expiration date
-        } else {
-            $this->view->setCookie($this->model->getCookiePassword());
+        } 
+        /*
+        else {
+            $this->view->setCookie($this->model->getTemporaryPassword());
             $this->model->storeCookieExpirationTime($this->view->getCookieExpiration());
         }
-
+		*/
 
         //if the user clicks loginbutton
         if ($this->view->retrieveFormPostInfoIfLoginButtonClicked()) {
@@ -87,9 +89,7 @@ class ControllerClass {
                 	$this->model->createTemporaryPassword($this->password);
                     $this->view->setCookie($this->userName, $this->model->getTemporaryPassword());
 					//we save the username, a temporary password and the expiration time to the server
-					if($this->view->didUserWantToStayLoggedIn()) {
-                    	$this->model->saveCredentialsOnServer($this->userName, $this->model->getTemporaryPassword, $this->view->getCookieExpiration());
-					}
+                    $this->model->saveCredentialsOnServer($this->userName, $this->model->temporaryPassword, $this->view->getCookieExpiration());
                 }
             //if the user input was fine, user is logged in
                 return $this->view->loggedInForm();

@@ -5,13 +5,13 @@
  * Date: 17/09/14
  * Time: 19:25
  */
- require_once("./helpers/FileHandling.php");
+require_once("./helpers/FileHandling.php");
  
 class ModelClass {
     private $user = "user";
     private $pass = "pass";
     private $errorMSG;
-    private $temporaryPassword;
+    public $temporaryPassword;
     private $cookieExpirationTime;
 	
 	private $usersFilePath = "Users.txt";						// I denna fil finns alla användare och deras (krypterade) lösenord sparade.
@@ -62,18 +62,19 @@ class ModelClass {
     //stores username, temporary password and expirationtime into textfile
     public function saveCredentialsOnServer($username, $password, $expirationTime) {
 			$savedCredentials = $username . ";" . $password . ";" . $expirationTime;
-			$this->helpers->WriteLineToFile($this->savedCredentialsFilePath, $savedCredentials);
+			FileHandling::WriteLineToFile($this->savedCredentialsFilePath, $savedCredentials);
 		}
     //checks if cookie is manipulated
     function ifCookieIsNotManipulated($userCookieValue, $passwordCookieValue) {
         //reads from file where expirationtime is stored
-        $this->myfile = file_get_contents($savedCredentialsFilePath);
+        $this->myfile = file($this->savedCredentialsFilePath);
 		foreach($this->myfile as $row) {
+			$credentials = explode(';', $row);
 			//checks if the cookies values checks out
-        	if($userCookieValue == $row[0] && $passwordCookieValue == $row[1]) {
+        	if($userCookieValue == $credentials[0] && $passwordCookieValue == $credentials[1]) {
 	            //if it does, the it checks if the time stored in cookie is more than the current time
 	            //if the stored time is set on a moment that is futher on than the current time, it has been manipulated
-	            if($row[2] > time()){
+	            if($credentials[2] > time()){
 	                return true;
 	            }
 	        }
@@ -89,7 +90,7 @@ class ModelClass {
     public function getErrorMSG() {
         return $this->errorMSG;
     }
-    public function getCookiePassword() {
-        return $this->cookiePassword;
+    public function getTemporaryPassword() {
+        return $this->temporaryPassword;
     }
 }
