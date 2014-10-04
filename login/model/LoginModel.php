@@ -8,14 +8,12 @@
 require_once("./helpers/FileHandling.php");
  
 class ModelClass {
-    private $user = "user";
-    private $pass = "pass";
     private $errorMSG;
     public $temporaryPassword;
     private $cookieExpirationTime;
 	
-	private $usersFilePath = "Users.txt";						// I denna fil finns alla användare och deras (krypterade) lösenord sparade.
-	private $savedCredentialsFilePath = "TempPasswords.txt";	// I denna fil lagras användare och temporära lösenord när användaren vill fortsätta vara inloggad.
+	private $usersFilePath = "./Users.txt";						// I denna fil finns alla användare och deras (krypterade) lösenord sparade.
+	private $savedCredentialsFilePath = "./TempPasswords.txt";	// I denna fil lagras användare och temporära lösenord när användaren vill fortsätta vara inloggad.
 
     public function __construct() {
     }
@@ -27,13 +25,21 @@ class ModelClass {
             $this->errorMSG = "Missing username";
         else if($password === "")
             $this->errorMSG = "Missing password";
-        else
-            $this->errorMSG = "Wrong username and/or password";
+            
+		$password = md5($password);
+		
+		$usersFile = file($this->usersFilePath);
+		foreach($usersFile as $row) {
+			$user = explode(';', $row);
+			//if it is correct, returns true
+	        if($userName === $user[0] && $password === $user[1]){
+	        	$_SESSION['user'] = $user[0];
+	            return true;
+	        }
+		}
+		$this->errorMSG = "Wrong username and/or password";
+		return false;
 
-        //if it is correct, returns true
-        if($userName === $this->user && $password === $this->pass){
-            return true;
-        }
     }
 
     //starts one session to keep user logged in, and one session to store webbrowser information
@@ -61,20 +67,21 @@ class ModelClass {
 
     //stores username, temporary password and expirationtime into textfile
     public function saveCredentialsOnServer($username, $password, $expirationTime) {
-			$savedCredentials = $username . ";" . $password . ";" . $expirationTime;
-			FileHandling::WriteLineToFile($this->savedCredentialsFilePath, $savedCredentials);
+			$savedCredentials = $username . ";" . $password . ";" . $expirationTime . ";";
+			FileHandling::writeLineToFile($this->savedCredentialsFilePath, $savedCredentials);
 		}
     //checks if cookie is manipulated
     function ifCookieIsNotManipulated($userCookieValue, $passwordCookieValue) {
         //reads from file where expirationtime is stored
-        $this->myfile = file($this->savedCredentialsFilePath);
-		foreach($this->myfile as $row) {
+        $tempCredentials = file($this->savedCredentialsFilePath);
+		foreach($tempCredentials as $row) {
 			$credentials = explode(';', $row);
 			//checks if the cookies values checks out
         	if($userCookieValue == $credentials[0] && $passwordCookieValue == $credentials[1]) {
 	            //if it does, the it checks if the time stored in cookie is more than the current time
 	            //if the stored time is set on a moment that is futher on than the current time, it has been manipulated
 	            if($credentials[2] > time()){
+	            	$_SESSION['user'] = $credentials[0];
 	                return true;
 	            }
 	        }
@@ -93,4 +100,8 @@ class ModelClass {
     public function getTemporaryPassword() {
         return $this->temporaryPassword;
     }
+	
+	public function getLoggedInUsername() {
+		return $_SESSION['user'];
+	}
 }

@@ -5,17 +5,17 @@
  * Date: 17/09/14
  * Time: 19:25
  */
-require_once("./view/view.php");
-require_once("./model/model.php");
+require_once("./login/view/LoginView.php");
+require_once("./login/model/LoginModel.php");
 
-class ControllerClass {
+class LoginController {
     private $userName;
     private $password;
     private $errorMSG;
 
     //creates instances of other classes
-    public function __construct() {
-        $this->view = new ViewClass();
+    public function __construct($userHasBeenRegistered = false) {
+        $this->view = new ViewClass($userHasBeenRegistered);
         $this->model = new ModelClass();
 
     }

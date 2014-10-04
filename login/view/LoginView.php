@@ -16,7 +16,10 @@ class ViewClass {
     private $userCookieValue;
 	private $passCookieValue;
    //initiates Time()
-    function __construct() {
+    function __construct($userHasBeenRegistered) {
+    	if($userHasBeenRegistered) {
+    		$this->message = "Registrering av ny användare lyckades";
+    	}
         $this->Time();
     }
     //function to check if page is refreshed(not used)
@@ -42,6 +45,8 @@ class ViewClass {
 
         $ret = "
         <h1>Login Application</h1>
+        <p><a href='?register'>Registrera ny användare</a></p>
+        <h2>Ej inloggad</h2>
         <form method=post enctype=multipart/form-data action=?loggedIn>
             <fieldset>
             <p>$message</p>
@@ -67,6 +72,7 @@ class ViewClass {
         $timeVariable = $this->time;
         $ret = "
        <h1>Logged in to Application</h1>
+       <h2>" . $_SESSION['user'] . " är inloggad</h2>
         <form method=post enctype=multipart/form-data action=?loggedOut>
             <fieldset>
                 <legend>You are now signed in as Admin</legend>
@@ -163,7 +169,7 @@ class ViewClass {
         $this->message = "Cookie info seem sketchy out";
     }
 
-	// Tar bort alla lagrade cookies.
+	// Removes ALL cookies
 	public function destroyAllCookies() {
 		foreach ($_COOKIE as $c_key => $c_value) {
 			setcookie($c_key, NULL, 1);
