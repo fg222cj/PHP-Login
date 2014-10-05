@@ -51,7 +51,13 @@ class RegisterView {
 	//TIme() set the local time and creates a string for the Forms to print the current time
     public function Time() {
         setlocale(LC_ALL, "sv_SE");
-        return $this->time = (strftime("%A, den %d %B år %Y. Klockan är [%X]"));
+        $weekDay = ucfirst(utf8_encode(strftime("%A")));	// Veckodag. ucfirst() sätter stor bokstav i början av veckodagen, ex: måndag blir Måndag. utf8_encode() gör att åäö funkar.
+		$date = strftime("%#d");							// Datum. kommer sannolikt behöva ändras i en linux-miljö.
+		$month = ucfirst(strftime("%B"));					// Månad. behöver inte utf8_encode eftersom inga svenska månadsnamn innehåller åäö.
+		$year = strftime("%Y");								// År.
+		$time = strftime("%H:%M:%S");						// Tid.
+		
+		return $weekDay . ", den " . $date . " " . $month . " år " . $year . ". Klockan är [" . $time . "]";
     }
     
     public function registrationAttempt() {

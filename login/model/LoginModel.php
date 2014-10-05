@@ -108,4 +108,11 @@ class ModelClass {
 	public function getLoggedInUsername() {
 		return $_SESSION['user'];
 	}
+	
+	public function getNewestUser() {
+		// http://stackoverflow.com/questions/1062716/php-returning-the-last-line-in-a-file
+		$lastRow = `tail -n 1 $this->usersFilePath`;
+		$user = explode(';', $lastRow);
+		return $user[0];
+	}
 }

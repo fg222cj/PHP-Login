@@ -15,10 +15,13 @@ class ViewClass {
     private $cookieExpiration;
     private $userCookieValue;
 	private $passCookieValue;
+	private $populateUsername = "";
+	
    //initiates Time()
-    function __construct($userHasBeenRegistered) {
-    	if($userHasBeenRegistered) {
+    function __construct($username) {
+    	if($username != "") {
     		$this->message = "Registrering av ny användare lyckades";
+			$this->populateUsername = $username;
     	}
         $this->Time();
     }
@@ -31,7 +34,13 @@ class ViewClass {
     //TIme() set the local time and creates a string for the Forms to print the current time
     public function Time() {
         setlocale(LC_ALL, "sv_SE");
-        $this->time = (strftime("%A, den %d %B år %Y. Klockan är [%X]"));
+        $weekDay = ucfirst(utf8_encode(strftime("%A")));	// Veckodag. ucfirst() sätter stor bokstav i början av veckodagen, ex: måndag blir Måndag. utf8_encode() gör att åäö funkar.
+		$date = strftime("%#d");							// Datum. kommer sannolikt behöva ändras i en linux-miljö.
+		$month = ucfirst(strftime("%B"));					// Månad. behöver inte utf8_encode eftersom inga svenska månadsnamn innehåller åäö.
+		$year = strftime("%Y");								// År.
+		$time = strftime("%H:%M:%S");						// Tid.
+		
+		$this->time = $weekDay . ", den " . $date . " " . $month . " år " . $year . ". Klockan är [" . $time . "]";
     }
     //Recieves the error message sent from controller<-Model
     public function errorMSGHandler($errorMSG) {
@@ -42,6 +51,11 @@ class ViewClass {
         $errorMSG = $this->errorMSG;
         $message = $this->message;
         $timeVariable = $this->time;
+		
+		$usernameValue = "";
+		if($this->populateUsername != "") {
+			$usernameValue = "value=" . $this->populateUsername;
+		}
 
         $ret = "
         <h1>Login Application</h1>
@@ -53,7 +67,7 @@ class ViewClass {
                 <p>$message</p>
             	<p>$errorMSG</p>
                     <label for=UserNameID>Username :</label>
-                        <input type=text size=20 name=userName id=UserNameID>
+                        <input type=text size=20 name=userName id=UserNameID $usernameValue>
                     <label for=PasswordID>Password  :</label>
                         <input type=password size=20  name=password id=PasswordID>
                     <label for=AutoLoginID>Keep me logged in :</label>

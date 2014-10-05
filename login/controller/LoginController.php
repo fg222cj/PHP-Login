@@ -15,8 +15,14 @@ class LoginController {
 
     //creates instances of other classes
     public function __construct($userHasBeenRegistered = false) {
-        $this->view = new ViewClass($userHasBeenRegistered);
         $this->model = new ModelClass();
+		
+		$recentlyAddedUser = "";
+		if($userHasBeenRegistered) {
+			$recentlyAddedUser = $this->model->getNewestUser();
+		}
+		
+		$this->view = new ViewClass($recentlyAddedUser);
 
     }
     //direct errormessages from model to view
@@ -43,7 +49,6 @@ class LoginController {
                 //it is doesn't find anything sketchy, it logs user in
                 return $this->view->loggedInForm();
             } else {
-            	$this->view->logoutFaultyCookie();
 				return $this->view->loginForm();
             }
             //if there is not any session, i checks if there exists a cookie
