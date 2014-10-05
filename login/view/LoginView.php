@@ -49,15 +49,15 @@ class ViewClass {
         <h2>Ej inloggad</h2>
         <form method=post enctype=multipart/form-data action=?loggedIn>
             <fieldset>
-            <p>$message</p>
-            <p>$errorMSG</p>
                 <legend>Login - Sign in with your Username and Password</legend>
+                <p>$message</p>
+            	<p>$errorMSG</p>
                     <label for=UserNameID>Username :</label>
-                        <input type=text size=20 name=userName id=userNameID value=>
+                        <input type=text size=20 name=userName id=UserNameID>
                     <label for=PasswordID>Password  :</label>
-                        <input type=password size=20  name=password id=PasswordID value=>
-                    <label for=AutologinID>Keep me logged in :</label>
-                        <input type=checkbox name=checked id=autoLoginID>
+                        <input type=password size=20  name=password id=PasswordID>
+                    <label for=AutoLoginID>Keep me logged in :</label>
+                        <input type=checkbox name=checked id=AutoLoginID>
                         <input type=submit name=loginbutton value=Login>
             </fieldset>
             <p>$timeVariable</p>

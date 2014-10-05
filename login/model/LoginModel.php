@@ -21,10 +21,14 @@ class ModelClass {
     //checks if users login input is correct
     public function userInputOK($userName,$password) {
 
-        if($userName === "")
-            $this->errorMSG = "Missing username";
-        else if($password === "")
-            $this->errorMSG = "Missing password";
+        if($userName === "") {
+        	$this->errorMSG = "Missing username";
+			return false;
+        }
+        if($password === "") {
+        	$this->errorMSG = "Missing password";
+			return false;
+        }
             
 		$password = md5($password);
 		
